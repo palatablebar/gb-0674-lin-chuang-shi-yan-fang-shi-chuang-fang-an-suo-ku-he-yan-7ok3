@@ -7,7 +7,7 @@ from app.config import ROOT, META, MODULES, DB_PATH
 from app.errors import BusinessError
 from app.engine import evaluate
 from app import store
-from app.archive import serialize
+from app.archive import serialize, serialize_lock
 
 @asynccontextmanager
 async def lifespan(app):
@@ -48,5 +48,10 @@ def review(run_id:str,payload:dict=Body(...)):
 def export(run_id:str):
     result=store.get(DB_PATH,run_id)
     return Response(serialize(result),media_type='application/zip',headers={'Content-Disposition':f'attachment; filename="{run_id}.zip"'})
+@app.get('/api/locks/{lock_no}/certificate')
+def lock_certificate(lock_no:str):
+    from app import lockstore
+    lock=lockstore.get_lock(DB_PATH,lock_no)
+    return Response(serialize_lock(lock),media_type='application/zip',headers={'Content-Disposition':f'attachment; filename="{lock_no}.zip"'})
 for key in MODULES:
     app.include_router(import_module(f'app.modules.{key}.handler').router)

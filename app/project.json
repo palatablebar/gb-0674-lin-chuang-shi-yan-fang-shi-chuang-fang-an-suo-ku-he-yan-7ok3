@@ -5,14 +5,16 @@
   "user": "临床试验数据管理员",
   "modules": [
     "记录采信",
+    "截止裁决",
     "方案版本",
     "访视排窗",
     "偏离复核",
     "复检裁决",
     "锁库检查",
-    "冻结归档"
+    "冻结归档",
+    "锁库登记"
   ],
-  "rule": "按入组基准计算访视半开窗，方案修订按受试者生效时间选版；漏访不可用复检伪填",
+  "rule": "按入组基准计算访视半开窗，方案修订按受试者生效时间选版；漏访不可用复检伪填；锁库以系统接收时刻为唯一纳入判据，晚到记录暂缓不改正式结果",
   "lane": "L4",
   "bg": "淡杏白",
   "hue": "玫红338°",
@@ -24,12 +26,14 @@
   "prompt": "数据工程 - 临床试验访视窗与方案锁库核验，中型项目",
   "keys": [
     "intake",
+    "cutoff",
     "protocol",
     "windows",
     "deviation",
     "retest",
     "locking",
-    "archive"
+    "archive",
+    "registry"
   ],
   "labels": {
     "id": "记录号",
@@ -52,6 +56,15 @@
     "line": "依据行",
     "_line": "原始行",
     "detail": "原因",
+    "received_at": "系统接收时刻",
+    "entry_mode": "录入方式",
+    "cutoff_at": "锁库截止时刻",
+    "timing_decision": "截止裁决",
+    "basis_time": "采用时间",
+    "event_at": "现场采样时刻",
+    "lock_no": "锁库编号",
+    "snapshot_sha256": "快照指纹",
+    "sealed_at": "封存时刻",
     "primary_id": "首次记录",
     "input": "输入",
     "accepted": "采纳",

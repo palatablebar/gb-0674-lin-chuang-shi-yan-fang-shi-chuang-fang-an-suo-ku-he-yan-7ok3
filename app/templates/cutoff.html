@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="grid grid-wide">
+  <section class="panel main-panel">
+    <div class="panel__head"><h2>截止裁决 · 在册记录（{{ view.rows|length }} 条）</h2><span>判据 {{ state.context.cutoff.basis_field }} ≤ {{ state.context.cutoff.cutoff_at }}</span></div>
+    <div class="table-frame">
+      <table>
+        <thead><tr><th>记录号</th><th>受试者</th><th>访视</th><th>录入方式</th><th>现场采样时刻</th><th>系统接收时刻</th><th>截止点</th><th>采用时间</th><th>裁决</th><th>原因码</th><th>原因</th></tr></thead>
+        <tbody>
+        {% for r in view.rows %}
+          <tr class="row-in"><td>{{ r.id }}</td><td>{{ r.subject }}</td><td>{{ r.visit }}</td><td>{{ r.entry_mode }}</td><td>{{ r.event_at }}</td><td>{{ r.received_at }}</td><td>{{ r.cutoff_at }}</td><td class="basis">{{ r.basis_time }}</td><td><span class="tag tag-in">{{ r.timing_decision }}</span></td><td>{{ r.code }}</td><td class="reason">{{ r.detail }}</td></tr>
+        {% else %}<tr><td>无在册记录。</td></tr>{% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="panel__head"><h2>晚到暂缓区（{{ view.late_rows|length }} 条）</h2><span>留痕 · 下一版冻结</span></div>
+    <div class="table-frame">
+      <table>
+        <thead><tr><th>记录号</th><th>受试者</th><th>访视</th><th>录入方式</th><th>现场采样时刻</th><th>系统接收时刻</th><th>采用时间</th><th>裁决</th><th>原因码</th><th>原因</th></tr></thead>
+        <tbody>
+        {% for r in view.late_rows %}
+          <tr class="row-held"><td>{{ r.id }}</td><td>{{ r.subject }}</td><td>{{ r.visit }}</td><td>{{ r.entry_mode }}</td><td>{{ r.event_at }}</td><td class="late-cell">{{ r.received_at }}</td><td class="basis">{{ r.basis_time }}</td><td><span class="tag tag-held">{{ r.timing_decision }}</span></td><td>{{ r.code }}</td><td class="reason">{{ r.detail }}</td></tr>
+        {% else %}<tr><td>本批无晚到暂缓记录。</td></tr>{% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="panel-note">暂缓不等于丢弃：原始记录、原始行号与原因随批次持久化，进入下一版冻结；本次正式锁库不引用这些结果。</div>
+  </section>
+</div>
+{% endblock %}

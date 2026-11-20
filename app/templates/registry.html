@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="grid grid-wide">
+  <section class="panel main-panel">
+    <div class="panel__head"><h2>锁库登记 · 仅追加封存</h2><span>截止 {{ state.context.cutoff.cutoff_at }}</span></div>
+    <div class="seal-card">
+      <dl>
+        <dt>当前批次</dt><dd>{{ state.manifest.run_id }}</dd>
+        <dt>规则版本</dt><dd>{{ state.manifest.rule_version }}</dd>
+        <dt>统一截止点</dt><dd>{{ state.context.cutoff.cutoff_at }}（{{ state.context.cutoff.timezone }}）</dd>
+        <dt>纳入判据</dt><dd>{{ state.context.cutoff.basis_field }} ≤ 截止点</dd>
+        <dt>快照指纹</dt><dd class="mono">{{ state.lock_preview.snapshot_sha256 }}</dd>
+        <dt>封存指纹 seal</dt><dd class="mono">{{ state.lock_preview.seal_sha256 }}</dd>
+        <dt>晚到暂缓</dt><dd>{{ state.lock_preview.held_late }} 条（不进入正式结果）</dd>
+        <dt>闸门状态</dt><dd><span class="tag {% if state.balance.status=='可锁库' %}tag-in{% else %}tag-held{% endif %}">{{ state.balance.status }}</span></dd>
+      </dl>
+      <div class="seal-actions">
+        <button id="seal-btn" {% if state.balance.status!='可锁库' %}disabled title="存在阻断项或晚到暂缓，不能封存"{% endif %}>封存为正式锁库</button>
+        <small>封存后 formal_locks 与审计链仅追加，任何 UPDATE/DELETE 被数据库拒绝。</small>
+      </div>
+      <output id="seal-feedback" class="seal-feedback" aria-live="polite"></output>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="panel__head"><h2>正式锁库与重跑校验</h2><span>同批重跑不改换结果</span></div>
+    <div class="table-frame">
+      <table id="locks-table">
+        <thead><tr><th>锁库编号</th><th>批次</th><th>截止点</th><th>封存时刻</th><th>操作</th></tr></thead>
+        <tbody><tr><td colspan="5" class="muted">加载中…</td></tr></tbody>
+      </table>
+    </div>
+    <div class="panel-note">
+      重跑读取封存的不可变输入快照重新计算：指纹一致→正式结果保持（UNCHANGED）；不一致或异常→保留旧版并追加失败记录，可在下方审计链核对。
+      <button id="recompute-fail" class="ghost">模拟重算失败（验证旧版保留）</button>
+    </div>
+  </section>
+
+  <section class="panel full-span">
+    <div class="panel__head"><h2>审计链（哈希链 · 仅追加）</h2><span id="audit-verify"></span></div>
+    <div class="table-frame">
+      <table id="audit-table">
+        <thead><tr><th>序号</th><th>动作</th><th>对象</th><th>时刻</th><th>前序哈希</th><th>本条哈希</th></tr></thead>
+        <tbody><tr><td colspan="6" class="muted">加载中…</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+</div>
+<script src="/static/registry.js" defer></script>
+<script>const CURRENT_RUN_ID={{ state.manifest.run_id|tojson }};</script>
+{% endblock %}

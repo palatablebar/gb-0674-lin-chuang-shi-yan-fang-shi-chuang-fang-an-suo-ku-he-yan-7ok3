@@ -1,13 +1,23 @@
 {
   "keys": [
     "intake",
+    "cutoff",
     "protocol",
     "windows",
     "deviation",
     "retest",
     "locking",
-    "archive"
+    "archive",
+    "registry"
   ],
+  "cutoff": {
+    "cutoff_at": "2026-11-20T18:00:00+08:00",
+    "timezone": "Asia/Shanghai",
+    "basis_field": "received_at",
+    "event_field": "at",
+    "rule": "RECEIPT_AT_OR_BEFORE_CUTOFF",
+    "decision": "系统接收时刻不晚于截止点方可进入本次锁库；晚到（含补录指向更早采样）一律暂缓，留痕进入下一版冻结，不覆盖正式结果。"
+  },
   "subjects": {
     "00001": "2026-10-01T00:00:00+08:00",
     "00002": "2026-10-01T00:00:00+08:00",
